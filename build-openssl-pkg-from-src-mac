@@ -1,0 +1,54 @@
+# Create OpenSSL package from source for CBA
+# Kevin Davies
+# Version 0.8
+
+ID=com.cba.openssl
+VER=1.1.1l
+DIR=openssl-${VER}
+GZ=${DIR}.tar.gz
+PKGVER=1.1.118
+PKGNAME=${DIR}.pkg
+BUILD=/tmp/openssl-build
+SCRIPTS=openssl-scripts
+
+# Grab latest source
+if [[ ! -f ${GZ} ]]; then
+  curl -LO https://www.openssl.org/source/${GZ}
+  if [[ ! -f ${GZ} ]]; then
+    echo Unable to download file. Please disconnect CBA VPN for the build to start, you can then reconnect.
+    exit 1
+  fi
+fi
+
+# Extract
+tar -zxf ${GZ}
+
+cd ${DIR}
+
+# Configure and test
+./Configure darwin64-x86_64-cc shared enable-ec_nistp_64_gcc_128 no-ssl2 no-ssl3 no-comp no-shared --openssldir=/usr/local/ssl/macos-x86_64
+make test
+if [[ $? -ne 0 ]]; then
+  echo "Tests failed."
+  echo "Please resove any issues"
+  echo "Have left you in ${DIR} directory."
+  exit 1
+fi
+
+# Install into tmp location
+mkdir ${BUILD}
+make install DESTDIR=${BUILD}
+
+# Copy postinstall script into place
+cd ..
+mkdir ${SCRIPTS}
+cp postinstall ${SCRIPTS}
+
+# Build MacOSX package
+pkgbuild --scripts ${SCRIPTS} --identifier ${ID} --version ${PKGVER} --root ${BUILD}  ${PKGNAME}
+
+# Cleanup
+rm -rf ${DIR} ${GZ} ${SCRIPTS} ${BUILD}
+
+exit
+
