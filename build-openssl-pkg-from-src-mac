@@ -2,14 +2,15 @@
 # Kevin Davies
 # Version 0.8
 
-ID=com.cba.openssl
-VER=1.1.1l
+ID=com.irules.openssl
+VER=1.1.1t
 DIR=openssl-${VER}
 GZ=${DIR}.tar.gz
-PKGVER=1.1.118
+PKGVER=1.1.121
 PKGNAME=${DIR}.pkg
 BUILD=/tmp/openssl-build
 SCRIPTS=openssl-scripts
+ARCH=$(uname -m)
 
 # Grab latest source
 if [[ ! -f ${GZ} ]]; then
@@ -26,7 +27,7 @@ tar -zxf ${GZ}
 cd ${DIR}
 
 # Configure and test
-./Configure darwin64-x86_64-cc shared enable-ec_nistp_64_gcc_128 no-ssl2 no-ssl3 no-comp no-shared --openssldir=/usr/local/ssl/macos-x86_64
+./Configure "darwin64-${ARCH}-cc" shared enable-ec_nistp_64_gcc_128 no-ssl2 no-ssl3 --openssldir="/usr/local/ssl/macos-${ARCH}"
 make test
 if [[ $? -ne 0 ]]; then
   echo "Tests failed."
