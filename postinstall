@@ -1,7 +1,3 @@
-
-echo "Post installation process started"
-# Update openssl for the user and not the system
-THIS=$(basename $SHELL)
-[[ $THIS -eq zsh ]] && echo alias openssl=/usr/local/bin/openssl >> ~/.zshrc
-[[ $THIS -eq bash ]] && echo alias openssl=/usr/local/bin/openssl >> ~/.bashrc
-echo "Post installation process finished"
+HOME=/Users/$USER
+[[ -f $HOME/.zshrc ]] && echo alias openssl=/usr/local/bin/openssl >> ~/.zshrc
+[[ -f $HOME/.bashrc ]] && echo alias openssl=/usr/local/bin/openssl >> ~/.bashrc
